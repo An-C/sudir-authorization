@@ -1,0 +1,58 @@
+<?xml  version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- (@Annotation-based configuration)-->
+    <context:annotation-config/>
+
+    <!--Where search(@Component, @Service)  -->
+    <context:component-scan base-package="ru.anc.work.authS2">
+        <context:exclude-filter type="regex" expression=".*Action"/>
+    </context:component-scan>
+    <context:component-scan base-package="ru.anc.work.configuration"/>
+
+    <!-- Configuration -->
+    <bean id="configDAO" class="ru.anc.work.configuration.dao.ConfigDAOImpl">
+        <property name="jdbcTemplate" ref="configJdbcTemplate"/>
+    </bean>
+
+
+
+    <!-- Data Access Resources -->
+    <bean id="configJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="configDataSource"/>
+    </bean>
+    <bean id="configDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+          p:driverClassName="oracle.jdbc.OracleDriver" p:url="jdbc:oracle:thin:@db.stroy.mos.ru:1521/DB01"
+          p:username="config_xd" p:password="config_xd"/>
+    <bean id="configuration1" class="ru.anc.work.configuration.service.ConfigurationImpl">
+        <property name="configDAO" ref="configDAO"/>
+    </bean>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+          p:location="classpath:test-config.properties">
+        <property name="properties" ref="configuration1"/>
+    </bean>
+
+    <!--BEGIN DataSources and JdbcTemplate of users -->
+    <bean id="galacticaDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+          p:driverClassName="${jdbc.driverClassName}" p:url="${jdbc.databaseurl}"
+          p:username="${gal.jdbc.username}" p:password="${gal.jdbc.password}"/>
+    <bean id="usersJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="galacticaDataSource"/>
+    </bean>
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="galacticaDataSource" />
+    </bean>
+    <!-- END DataSources and JdbcTemplate of users -->
+
+
+    <bean id="userSessionDAO" class="ru.anc.work.components.dao.UserSessionDAOImpl" />
+    <bean class="ru.anc.work.components.dao.CommonDAOImpl" />
+
+</beans>

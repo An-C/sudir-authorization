@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- =========================================================================== -->
+
+    <!-- Configuration -->
+    <bean id="configDAO" class="ru.anc.work.configuration.dao.ConfigDAOImpl">
+        <property name="jdbcTemplate" ref="configJdbcTemplate" />
+    </bean>
+
+    <bean id="configJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="configDataSource"></property>
+    </bean>
+
+    <bean id="configDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="java:comp/env/jdbc/ConfigXDPP"/>
+    </bean>
+
+    <bean id="configuration" class="ru.anc.work.configuration.service.ConfigurationImpl" >
+        <property name="configDAO" ref="configDAO"/>
+    </bean>
+
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="properties" ref="configuration" />
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="fileEncoding" value="UTF-8" />
+        <property name="location" value="classpath:config.properties" />
+    </bean>
+
+
+    <!-- Datasource к galactica_pp -->
+    <bean id="galacticaDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="java:comp/env/jdbc/GalacticaPP" />
+    </bean>
+    <bean id="usersJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="galacticaDataSource" />
+    </bean>
+
+
+    <bean id="sudirUserDAO" class="ru.anc.work.authS2.dao.Sudir2UserDAOImpl"/>
+    <bean id="sudirLoginService" class="ru.anc.work.authS2.service.Sudir2LoginServiceImpl"/>
+    <bean id="sudirLogoutService" class="ru.anc.work.authS2.service.Sudir2LogoutServiceImpl"/>
+    <bean id="cookieAuthenticationService" class="ru.anc.work.authentication.web.security.CookieAuthentificationService"/>
+
+
+    <bean id="deployDAO" class="ru.anc.work.components.dao.DeployDAOImpl" />
+    <bean id="userSessionDAO" class="ru.anc.work.components.dao.UserSessionDAOImpl" />
+    <bean id="configBindingServletContextListener" class="ru.anc.work.components.web.ConfigBindingServletContextListener" />
+    <bean id="propertyRefreshAction" class="ru.anc.work.components.web.action.PropertyRefreshAction" />
+    <bean id="errorMailSender" class="ru.anc.work.components.service.ErrorMailService">
+        <property name="applicationName" value="authS2"/>
+    </bean>
+
+    <bean class="ru.anc.work.components.web.interseptors.ErrorInterceptor" />
+    <bean class="ru.anc.work.components.dao.CommonDAOImpl" />
+    <bean class="ru.anc.work.components.service.UserEventServiceImpl" />
+    <bean class="ru.anc.work.components.web.SessionFacade" />
+    <bean class="ru.anc.work.components.dao.UserEventDAOImpl" />
+    <bean class="ru.anc.work.components.dao.UserEventTypeDAOImpl" />
+    <bean class="ru.anc.work.components.service.LangChangeServiceImpl" />
+    <bean class="ru.anc.work.components.service.I18n.I18nService" />
+    <bean class="ru.anc.work.components.dao.I18n.I18nDAOImpl" />
+    <bean class="ru.anc.work.components.dao.I18n.I18nTranslateDAOImpl" />
+    <bean class="ru.anc.work.components.dao.UserDAOImpl" />
+
+</beans>
